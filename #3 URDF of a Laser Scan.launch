@@ -1,0 +1,79 @@
+
+
+
+1. append URDF 
+      <link name="sensor_laser">
+        <inertial>
+          <origin xyz="0 0 0" rpy="0 0 0" />
+          <mass value="1" />
+          <xacro:cylinder_inertia mass="1" r="0.05" l="0.1" />
+        </inertial>
+
+        <visual>
+          <origin xyz="0 0 0" rpy="0 0 0" />
+          <geometry>
+          <cylinder radius="0.05" length="0.1"/>
+          </geometry>
+          <material name="white" />
+        </visual>
+
+        <collision>
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <geometry>
+            <cylinder radius="0.05" length="0.1"/>
+          </geometry>
+        </collision>
+      </link>
+
+      <joint name="joint_sensor_laser" type="fixed">
+        <origin xyz="0.15 0 0.05" rpy="0 0 0"/>
+        <parent link="link_chassis"/>
+        <child link="sensor_laser"/>
+      </joint>
+    
+      <macro name="cylinder_inertia" params="mass r l">
+        <inertia  ixx="${mass*(3*r*r+l*l)/12}" ixy = "0" ixz = "0"
+            iyy="${mass*(3*r*r+l*l)/12}" iyz = "0"
+            izz="${mass*(r*r)/2}" />
+      </macro>
+      
+2. $ roslaunch m2wr_description rviz.launch
+
+3. append URDF for Gazebo
+      <gazebo reference="sensor_laser">
+        <sensor type="ray" name="head_hokuyo_sensor">
+          <pose>0 0 0 0 0 0</pose>
+          <visualize>false</visualize>
+          <update_rate>20</update_rate>
+          <ray>
+            <scan>
+              <horizontal>
+                <samples>720</samples>
+                <resolution>1</resolution>
+                <min_angle>-1.570796</min_angle>
+                <max_angle>1.570796</max_angle>
+              </horizontal>
+            </scan>
+            <range>
+              <min>0.10</min>
+              <max>10.0</max>
+              <resolution>0.01</resolution>
+            </range>
+            <noise>
+              <type>gaussian</type>
+              <mean>0.0</mean>
+              <stddev>0.01</stddev>
+            </noise>
+          </ray>
+          <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_laser.so">
+            <topicName>/m2wr/laser/scan</topicName>
+            <frameName>sensor_laser</frameName>
+          </plugin>
+        </sensor>
+      </gazebo>
+
+4. $ roslaunch m2wr_description spawn.launch
+5. $ roslaunch m2wr_description rviz.launch  ==> opic /m2wr/laser/scan
+
+    
+      
