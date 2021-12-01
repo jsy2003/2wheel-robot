@@ -26,3 +26,7 @@
 
     if __name__ == '__main__':
       main()
+
+4. $ chmod +x reading_laser.py
+5. $ roslaunch m2wr_description spawn.launch
+6. $ rosrun motion_plan reading_laser.py
